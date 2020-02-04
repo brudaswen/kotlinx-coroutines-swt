@@ -28,17 +28,21 @@ internal class SWTDefaultDisplayDispatchThread {
         // Start new thread and let it initialize Display and Shell
         val future = CompletableFuture<Shell>()
         thread = thread(name = name) {
-            val display = Display.getDefault()
-            val shell = Shell(display)
-            future.complete(shell)
+            try {
+                val display = Display.getDefault()
+                val shell = Shell(display)
+                future.complete(shell)
 
-            // Start dispatch loop
-            while (!shell.isDisposed) {
-                if (!display.readAndDispatch()) {
-                    display.sleep()
+                // Start dispatch loop
+                while (!shell.isDisposed) {
+                    if (!display.readAndDispatch()) {
+                        display.sleep()
+                    }
                 }
+                display.dispose()
+            } catch (e: Throwable) {
+                future.completeExceptionally(e)
             }
-            display.dispose()
         }
 
         // Wait until Shell is ready
