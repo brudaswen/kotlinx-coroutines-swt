@@ -3,13 +3,15 @@ plugins {
     kotlin("jvm") version "1.3.61" apply false
 }
 
+val coroutinesVersion = "1.3.3"
 val swtVersion = "3.113.0"
 val swtPlatform = getOsgiPlatform()
 
 allprojects {
     group = "de.brudaswen.kotlinx.coroutines"
-    version = "1.3.3"
+    version = "0.1.0-SNAPSHOT"
 
+    extra["coroutinesVersion"] = coroutinesVersion
     extra["swtVersion"] = swtVersion
     extra["swtPlatform"] = swtPlatform
 
