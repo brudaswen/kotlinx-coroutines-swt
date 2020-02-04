@@ -5,8 +5,6 @@
 
 package kotlinx.coroutines
 
-import org.junit.After
-import org.junit.Before
 import java.lang.Math.cbrt
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -15,6 +13,8 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.coroutineContext
 import kotlin.math.roundToInt
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.assertTrue
 import kotlin.test.expect
 
@@ -135,7 +135,7 @@ open class TestBase {
         finished.set(false)
     }
 
-    @Before
+    @BeforeTest
     fun before() {
         initPoolsBeforeTest()
         threadsBefore = currentThreads()
@@ -147,7 +147,7 @@ open class TestBase {
         }
     }
 
-    @After
+    @AfterTest
     fun onCompletion() {
         // onCompletion should not throw exceptions before it finishes all cleanup, so that other tests always
         // start in a clear, restored state

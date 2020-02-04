@@ -2,12 +2,12 @@ package kotlinx.coroutines.swt
 
 import kotlinx.coroutines.*
 import org.eclipse.swt.widgets.Display
-import org.junit.AfterClass
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.test.assertTrue
 
 class SwtTest : TestBase() {
@@ -15,7 +15,7 @@ class SwtTest : TestBase() {
     private val display
         get() = DISPATCHER.display
 
-    @Before
+    @BeforeTest
     fun setup() {
         ignoreLostThreads(DISPATCHER.name)
     }
@@ -169,14 +169,13 @@ class SwtTest : TestBase() {
 
         private lateinit var DISPATCHER: SWTDefaultDisplayDispatchThread
 
-        @BeforeClass
+        @BeforeAll
         @JvmStatic
         fun init() {
-            DISPATCHER =
-                SWTDefaultDisplayDispatchThread()
+            DISPATCHER = SWTDefaultDisplayDispatchThread()
         }
 
-        @AfterClass
+        @AfterAll
         @JvmStatic
         fun cleanup() {
             DISPATCHER.dispose()
