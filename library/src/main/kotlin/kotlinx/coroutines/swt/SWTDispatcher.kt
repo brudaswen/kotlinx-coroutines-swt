@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.internal.MainDispatcherFactory
 import kotlinx.coroutines.swt.SwtDefault.delay
 import org.eclipse.swt.widgets.Display
+import org.eclipse.swt.widgets.Widget
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -24,6 +25,14 @@ val Dispatchers.SWT: MainCoroutineDispatcher
 @UseExperimental(InternalCoroutinesApi::class)
 fun Dispatchers.swt(display: Display): MainCoroutineDispatcher =
     SwtDispatcherImpl(display)
+
+/**
+ * Dispatches execution onto SWT event dispatching thread of the given [Widget]'s [Display] and provides native [delay] support.
+ */
+@Suppress("unused")
+@UseExperimental(InternalCoroutinesApi::class)
+fun Dispatchers.swt(widget: Widget): MainCoroutineDispatcher =
+    SwtDispatcherImpl(widget.display)
 
 /**
  * Base dispatcher for SWT event dispatching thread.
