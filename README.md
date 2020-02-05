@@ -7,16 +7,75 @@
 
 Library to easily use kotlinx.coroutines in SWT applications
 
-Provides `Dispatchers.SWT` context, `Dispatchers.swt(Display)` context and `Dispatchers.Main` implementation for SWT UI 
+Provides `Dispatchers.SWT`, `Dispatchers.swt(Display)`, `Dispatchers.swt(Widget)` and `Dispatchers.Main` implementation for SWT UI 
 applications.
 
+**NOTE:**
 The coroutine dispatcher `Dispatchers.SWT` (or `Dispatchers.Main`) dispatches events to the SWT default display.
 Therefore, the SWT default display should be created before calling `Dispatchers.SWT`. Otherwise a new default display
 is created (making the thread that invokes `Dispatchers.SWT` its user-interface thread).
 
-## Dependency
+## Gradle Dependencies
+```kotlin
+// Kotlin Coroutines SWT
+implementation("de.brudaswen.kotlinx.coroutines:kotlinx-coroutines-swt:1.3.3")
+
+// Platform specific SWT dependency has to be added manually
+implementation("org.eclipse.platform:org.eclipse.swt.gtk.linux.x86_64:3.113.0")
+implementation("org.eclipse.platform:org.eclipse.swt.cocoa.macosx.x86_64:3.113.0")
+implementation("org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.113.0")
+
+// Kotlin Coroutines is added automatically, but can be added to change the version
+implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
+```
 
 ## Usage
+```kotlin
+fun main() {
+    // Create UI in some thread
+    val display = Display.getDefault()
+    val shell = Shell(display)
+    val label = Label(shell, SWT.NULL)
+    // ...
+
+    updateUiInNewThread(display, label)
+
+    while (!shell.isDisposed) {
+        if (!display.readAndDispatch()) {
+            display.sleep()
+        }
+    }
+}
+
+fun updateUiInNewThread(display: Display, label: Label) = thread {
+    // Dispatch to default display (via [Dispatchers.Main])
+    GlobalScope.launch(Dispatchers.Main) {
+        label.text = "Main!"
+    }
+
+    // Dispatch to default display (via [Dispatchers.SWT])
+    GlobalScope.launch(Dispatchers.SWT) {
+        label.text = "SWT!"
+    }
+
+    // Dispatch to given display
+    GlobalScope.launch(Dispatchers.swt(display)) {
+        label.text = "Display!"
+    }
+
+    // Dispatch to display of widget
+    GlobalScope.launch(Dispatchers.swt(label)) {
+        label.text = "Widget!"
+    }
+}
+```
+
+## Requirements
+
+| Dependency          | Versions          |
+|---                  |---                |
+| *Kotlin Coroutines* | 1.1.0 ⁠– 1.3.3     |
+| *SWT*               | 3.105.3 ⁠– 3.113.0 |
 
 ## License
 
