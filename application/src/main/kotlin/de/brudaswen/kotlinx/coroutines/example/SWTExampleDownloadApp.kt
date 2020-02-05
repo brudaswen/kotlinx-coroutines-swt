@@ -5,9 +5,9 @@ import kotlinx.coroutines.swt.swt
 import org.eclipse.swt.SWT
 import org.eclipse.swt.layout.FillLayout
 import org.eclipse.swt.widgets.Display
+import org.eclipse.swt.widgets.Label
 import org.eclipse.swt.widgets.ProgressBar
 import org.eclipse.swt.widgets.Shell
-import org.eclipse.swt.widgets.Text
 import kotlin.concurrent.thread
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -90,10 +90,7 @@ private class Gui(display: Display) : CoroutineScope {
         maximum = 100
     }
 
-    private val progressText = Text(shell, SWT.SINGLE or SWT.CENTER).apply {
-        editable = false
-        enabled = false
-    }
+    private val progressLabel = Label(shell, SWT.SINGLE or SWT.CENTER)
 
     /** Open GUI window.*/
     fun open() = launchIfNotDisposed {
@@ -109,7 +106,7 @@ private class Gui(display: Display) : CoroutineScope {
     /** Update progress information.*/
     fun updateProgress(percent: Int) = launchIfNotDisposed {
         println("Updating progress: $percent")
-        progressText.text = "$percent %"
+        progressLabel.text = "$percent %"
         progressBar.selection = percent
         shell.layout(true, true)
     }

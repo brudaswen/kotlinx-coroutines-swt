@@ -7,8 +7,8 @@ import kotlinx.coroutines.launch
 import org.eclipse.swt.SWT
 import org.eclipse.swt.layout.FillLayout
 import org.eclipse.swt.widgets.Display
+import org.eclipse.swt.widgets.Label
 import org.eclipse.swt.widgets.Shell
-import org.eclipse.swt.widgets.Text
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -34,10 +34,7 @@ fun main() {
         }
     }
 
-    val timeText = Text(shell, SWT.SINGLE or SWT.CENTER).apply {
-        editable = false
-        enabled = false
-    }
+    val label = Label(shell, SWT.SINGLE or SWT.CENTER)
 
     shell.pack()
     shell.open()
@@ -48,7 +45,7 @@ fun main() {
         val dateFormat = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
         while (!shell.isDisposed) {
             println("Updating time")
-            timeText.text = dateFormat.format(LocalTime.now())
+            label.text = dateFormat.format(LocalTime.now())
             delay(TIME_UPDATE_DELAY)
         }
     }
