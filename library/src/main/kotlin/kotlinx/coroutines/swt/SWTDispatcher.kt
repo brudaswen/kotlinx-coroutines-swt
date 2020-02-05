@@ -2,7 +2,6 @@ package kotlinx.coroutines.swt
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.internal.MainDispatcherFactory
-import kotlinx.coroutines.swt.SwtDefault.delay
 import org.eclipse.swt.widgets.Display
 import org.eclipse.swt.widgets.Widget
 import kotlin.coroutines.CoroutineContext

@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    id("org.jetbrains.dokka") version "0.9.18"
     `maven-publish`
     signing
 }
@@ -25,8 +26,6 @@ dependencies {
 
 java {
     withSourcesJar()
-    // TODO Does not contain JavaDoc for Kotlin files
-    withJavadocJar()
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -39,6 +38,23 @@ tasks.named<Test>("test") {
 
 tasks.withType<GenerateModuleMetadata> {
     enabled = !isSnapshot()
+}
+
+val dokkaJavadoc by tasks.creating(org.jetbrains.dokka.gradle.DokkaTask::class) {
+    // TODO Change to "javadoc" as soon as https://youtrack.jetbrains.com/issue/KT-31710 is fixed
+    outputFormat = "html"
+    outputDirectory = "$buildDir/dokkaJavadoc"
+
+    externalDocumentationLink {
+        url = url("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/")
+    }
+}
+
+val dokkaJavadocJar by tasks.creating(Jar::class) {
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+    description = "Assembles Kotlin docs with Dokka"
+    archiveClassifier.set("javadoc")
+    from(dokkaJavadoc)
 }
 
 publishing {
@@ -76,6 +92,7 @@ publishing {
             }
 
             from(components["java"])
+            artifact(dokkaJavadocJar)
         }
     }
 
@@ -108,3 +125,8 @@ signing {
 }
 
 fun isSnapshot() = version.toString().endsWith("-SNAPSHOT")
+
+fun org.jetbrains.dokka.gradle.DokkaTask.externalDocumentationLink(closure: org.jetbrains.dokka.DokkaConfiguration.ExternalDocumentationLink.Builder.() -> Unit) =
+    externalDocumentationLink(delegateClosureOf(closure))
+
+fun url(path: String) = uri(path).toURL()
