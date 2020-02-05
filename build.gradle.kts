@@ -1,6 +1,7 @@
 plugins {
     base
     kotlin("jvm") version "1.3.61" apply false
+    id("net.researchgate.release") version "2.6.0"
 }
 
 val coroutinesVersion = "1.3.3"
@@ -9,7 +10,6 @@ val swtPlatform = getOsgiPlatform()
 
 allprojects {
     group = "de.brudaswen.kotlinx.coroutines"
-    version = "0.1.0-SNAPSHOT"
 
     extra["coroutinesVersion"] = coroutinesVersion
     extra["swtVersion"] = swtVersion
@@ -27,6 +27,13 @@ allprojects {
                 .with(module("org.eclipse.platform:org.eclipse.swt.$swtPlatform:$swtVersion"))
         }
     }
+}
+
+// Use `./gradlew release` to create a tagged release commit
+release {
+    preTagCommitMessage = "[Gradle Release Plugin] Release version"
+    tagCommitMessage = "[Gradle Release Plugin] Release version"
+    newVersionCommitMessage = "[Gradle Release Plugin] New version"
 }
 
 /** Get SWT platform identifier. */
