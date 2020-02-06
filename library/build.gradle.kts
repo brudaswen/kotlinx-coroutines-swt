@@ -6,6 +6,7 @@ plugins {
     id("de.marcphilipp.nexus-publish") version "0.4.0"
     `maven-publish`
     signing
+    jacoco
 }
 
 val coroutinesVersion = extra["coroutinesVersion"]
@@ -123,7 +124,6 @@ publishing {
     }
 }
 
-
 nexusPublishing {
     repositories {
         sonatype()
@@ -144,6 +144,17 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
 
     sign(publishing.publications["library"])
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.isEnabled = true
+        html.isEnabled = false
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestReport)
 }
 
 fun isSnapshot() = version.toString().endsWith("-SNAPSHOT")
