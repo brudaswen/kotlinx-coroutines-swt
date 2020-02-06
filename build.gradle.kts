@@ -2,6 +2,7 @@ plugins {
     base
     kotlin("jvm") version "1.3.61" apply false
     id("net.researchgate.release") version "2.6.0"
+    id("io.codearte.nexus-staging") version "0.21.2"
 }
 
 val coroutinesVersion = "1.3.3"
@@ -34,6 +35,16 @@ release {
     preTagCommitMessage = "[Gradle Release Plugin] Release version"
     tagCommitMessage = "[Gradle Release Plugin] Release version"
     newVersionCommitMessage = "[Gradle Release Plugin] New version"
+}
+
+val mavenCentralUsername: String? by project
+val mavenCentralPassword: String? by project
+nexusStaging {
+    packageGroup = "de.brudaswen"
+    username = mavenCentralUsername
+    password = mavenCentralPassword
+    numberOfRetries = 60
+    delayBetweenRetriesInMillis = 10_000
 }
 
 /** Get SWT platform identifier. */

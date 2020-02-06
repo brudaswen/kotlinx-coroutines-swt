@@ -1,6 +1,9 @@
+import java.time.Duration
+
 plugins {
     kotlin("jvm")
     id("org.jetbrains.dokka") version "0.9.18"
+    id("de.marcphilipp.nexus-publish") version "0.4.0"
     `maven-publish`
     signing
 }
@@ -57,6 +60,29 @@ val dokkaJavadocJar by tasks.creating(Jar::class) {
     from(dokkaJavadoc)
 }
 
+val publishRelease = tasks.create("publishRelease") {
+    description = "Publish to Maven Central (iff this is a release version)."
+}
+
+val publishSnapshot = tasks.create("publishSnapshot") {
+    description = "Publish to Maven Central (iff this is a snapshot version)."
+}
+
+tasks.whenTaskAdded {
+    if (name == "publishToSonatype") {
+        val publishToSonatype = this
+        if (!isSnapshot()) {
+            publishRelease.dependsOn(publishToSonatype)
+
+            val closeAndReleaseRepository = rootProject.tasks.getByName("closeAndReleaseRepository")
+            closeAndReleaseRepository.mustRunAfter(publishToSonatype)
+            publishRelease.dependsOn(closeAndReleaseRepository)
+        } else {
+            publishSnapshot.dependsOn(publishToSonatype)
+        }
+    }
+}
+
 publishing {
     publications {
         create<MavenPublication>("library") {
@@ -95,22 +121,18 @@ publishing {
             artifact(dokkaJavadocJar)
         }
     }
+}
 
+
+nexusPublishing {
     repositories {
-        maven {
-            name = "MavenCentral"
-            url = when {
-                isSnapshot() -> uri("https://oss.sonatype.org/content/repositories/snapshots/")
-                else -> uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            }
+        sonatype()
+    }
 
-            val mavenCentralUsername: String? by project
-            val mavenCentralPassword: String? by project
-            credentials {
-                username = mavenCentralUsername
-                password = mavenCentralPassword
-            }
-        }
+    clientTimeout.set(Duration.ofMinutes(30))
+    val useSnapshot: String? by project
+    if (useSnapshot != null) {
+        useStaging.set(useSnapshot?.toBoolean()?.not())
     }
 }
 
