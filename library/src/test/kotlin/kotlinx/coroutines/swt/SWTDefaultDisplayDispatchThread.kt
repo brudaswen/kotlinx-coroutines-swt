@@ -18,9 +18,10 @@ internal class SWTDefaultDisplayDispatchThread {
 
     private var thread: Thread
 
-    private val shell: Shell
+    /** Get [Shell] of this dispatcher thread */
+    val shell: Shell
 
-    /** Get or create default [Display] and dispatcher. */
+    /** Get [Display] of this dispatcher thread */
     val display: Display
         get() = shell.display
 
