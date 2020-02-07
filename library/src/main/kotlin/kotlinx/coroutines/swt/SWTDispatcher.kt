@@ -7,7 +7,8 @@ import org.eclipse.swt.widgets.Widget
 import kotlin.coroutines.CoroutineContext
 
 /**
- * Dispatches execution onto SWT event dispatching thread of the **default** [Display] and provides native [delay] support.
+ * Dispatches execution onto SWT event dispatching thread of the **default** [Display] and provides native
+ * [kotlinx.coroutines.delay] support.
  *
  * **NOTE:** Be aware that calling this method creates a default [Display] (making the thread that invokes this
  * method its user-interface thread) if it did not already exist.
@@ -17,14 +18,16 @@ val Dispatchers.SWT: MainCoroutineDispatcher
     get() = SwtDefault
 
 /**
- * Dispatches execution onto SWT event dispatching thread of the given [Display] and provides native [delay] support.
+ * Dispatches execution onto SWT event dispatching thread of the given [Display] and provides native
+ * [kotlinx.coroutines.delay] support.
  */
 @Suppress("unused")
 fun Dispatchers.swt(display: Display): MainCoroutineDispatcher =
     SwtDispatcherImpl(display)
 
 /**
- * Dispatches execution onto SWT event dispatching thread of the given [Widget]'s [Display] and provides native [delay] support.
+ * Dispatches execution onto SWT event dispatching thread of the given [Widget]'s [Display] and provides native
+ * [kotlinx.coroutines.delay] support.
  */
 @Suppress("unused")
 fun Dispatchers.swt(widget: Widget): MainCoroutineDispatcher =
@@ -99,6 +102,7 @@ internal class SWTDispatcherFactory : MainDispatcherFactory {
 }
 
 /**
- * Dispatches execution onto SWT event dispatching thread of the **default** [Display] and provides native [delay] support.
+ * Dispatches execution onto SWT event dispatching thread of the **default** [Display] and provides native
+ * [kotlinx.coroutines.delay] support.
  */
 internal object SwtDefault : SwtDispatcherImpl(Display.getDefault(), "Default")
