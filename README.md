@@ -19,14 +19,14 @@ is created (making the thread that invokes `Dispatchers.SWT` its user-interface 
 ## Gradle Dependencies
 ```kotlin
 // Kotlin Coroutines SWT
-implementation("de.brudaswen.kotlinx.coroutines:kotlinx-coroutines-swt:1.3.3")
+implementation("de.brudaswen.kotlinx.coroutines:kotlinx-coroutines-swt:1.0.0")
 
 // Platform specific SWT dependency has to be added manually
 implementation("org.eclipse.platform:org.eclipse.swt.gtk.linux.x86_64:3.113.0")
 implementation("org.eclipse.platform:org.eclipse.swt.cocoa.macosx.x86_64:3.113.0")
 implementation("org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.113.0")
 
-// Kotlin Coroutines is added automatically, but can be added to change the version
+// Kotlin Coroutines is added automatically, but can be added to force a specific version
 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
 ```
 
