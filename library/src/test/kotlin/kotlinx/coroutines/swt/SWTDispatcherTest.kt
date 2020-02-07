@@ -17,7 +17,7 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 @UseExperimental(ExperimentalCoroutinesApi::class)
-class SwtTest : TestBase() {
+class SWTDispatcherTest : TestBase() {
 
     private val display
         get() = DISPATCHER.display
