@@ -1,6 +1,6 @@
 # Kotlin Coroutines SWT
 
-[![Maven Central](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https%3A%2F%2Fimg.shields.io%2Fmaven-central%2Fv%2Fde.brudaswen.kotlinx.coroutines%2Fkotlinx-coroutines-swt%3Fstyle%3Dflat-square)](https://mvnrepository.com/artifact/de.brudaswen.kotlinx.coroutines/kotlinx-coroutines-swt)
+[![Maven Central](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https%3A%2F%2Fimg.shields.io%2Fmaven-central%2Fv%2Fde.brudaswen.kotlinx.coroutines%2Fkotlinx-coroutines-swt%3Fstyle%3Dflat-square)](https://search.maven.org/artifact/de.brudaswen.kotlinx.coroutines/kotlinx-coroutines-swt)
 ![Snapshot](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https%3A%2F%2Fimg.shields.io%2Fnexus%2Fs%2Fde.brudaswen.kotlinx.coroutines%2Fkotlinx-coroutines-swt%3Flabel%3Dsnapshot%26server%3Dhttps%253A%252F%252Foss.sonatype.org%26style%3Dflat-square)
 [![CI Status](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https%3A%2F%2Fimg.shields.io%2Fgithub%2Fworkflow%2Fstatus%2Fbrudaswen%2Fkotlinx-coroutines-swt%2FCI%3Fstyle%3Dflat-square)](https://github.com/brudaswen/kotlinx-coroutines-swt/actions?query=workflow%3ACI)
 [![Codecov](https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&url=https%3A%2F%2Fimg.shields.io%2Fcodecov%2Fc%2Fgithub%2Fbrudaswen%2Fkotlinx-coroutines-swt%3Fstyle%3Dflat-square)](https://codecov.io/gh/brudaswen/kotlinx-coroutines-swt)
