@@ -13,7 +13,6 @@ import kotlin.coroutines.CoroutineContext
  * method its user-interface thread) if it did not already exist.
  */
 @Suppress("unused")
-@UseExperimental(InternalCoroutinesApi::class)
 val Dispatchers.SWT: MainCoroutineDispatcher
     get() = SwtDefault
 
@@ -21,7 +20,6 @@ val Dispatchers.SWT: MainCoroutineDispatcher
  * Dispatches execution onto SWT event dispatching thread of the given [Display] and provides native [delay] support.
  */
 @Suppress("unused")
-@UseExperimental(InternalCoroutinesApi::class)
 fun Dispatchers.swt(display: Display): MainCoroutineDispatcher =
     SwtDispatcherImpl(display)
 
@@ -29,7 +27,6 @@ fun Dispatchers.swt(display: Display): MainCoroutineDispatcher =
  * Dispatches execution onto SWT event dispatching thread of the given [Widget]'s [Display] and provides native [delay] support.
  */
 @Suppress("unused")
-@UseExperimental(InternalCoroutinesApi::class)
 fun Dispatchers.swt(widget: Widget): MainCoroutineDispatcher =
     SwtDispatcherImpl(widget.display)
 
@@ -74,7 +71,6 @@ internal abstract class SwtDispatcher(
 /**
  * Immediate dispatcher for SWT event dispatching for the given [Display].
  */
-@InternalCoroutinesApi
 private class ImmediateSWTDispatcher(display: Display, name: String) : SwtDispatcher(display, name) {
     override val immediate: MainCoroutineDispatcher
         get() = this
@@ -88,7 +84,6 @@ private class ImmediateSWTDispatcher(display: Display, name: String) : SwtDispat
 /**
  * Dispatcher for SWT event dispatching for the given [Display].
  */
-@InternalCoroutinesApi
 internal open class SwtDispatcherImpl(display: Display, name: String = display.toString()) :
     SwtDispatcher(display, name) {
     override val immediate: MainCoroutineDispatcher
@@ -110,5 +105,4 @@ internal class SWTDispatcherFactory : MainDispatcherFactory {
 /**
  * Dispatches execution onto SWT event dispatching thread of the **default** [Display] and provides native [delay] support.
  */
-@InternalCoroutinesApi
 internal object SwtDefault : SwtDispatcherImpl(Display.getDefault(), "Default")
