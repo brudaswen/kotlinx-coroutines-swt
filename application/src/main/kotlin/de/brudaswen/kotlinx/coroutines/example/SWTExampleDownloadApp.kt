@@ -1,6 +1,8 @@
 package de.brudaswen.kotlinx.coroutines.example
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.swt.launch
+import kotlinx.coroutines.swt.orNull
 import kotlinx.coroutines.swt.swt
 import org.eclipse.swt.SWT
 import org.eclipse.swt.layout.FillLayout
@@ -9,8 +11,6 @@ import org.eclipse.swt.widgets.Label
 import org.eclipse.swt.widgets.ProgressBar
 import org.eclipse.swt.widgets.Shell
 import kotlin.concurrent.thread
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 /** Update download progress every x milliseconds. */
 private const val DOWNLOAD_DELAY = 250L
@@ -22,9 +22,7 @@ private const val DOWNLOAD_DELAY = 250L
  */
 fun main() {
     // Initialize default Display in another thread
-    thread {
-        Display.getDefault()
-    }.join()
+    thread { Display.getDefault() }.join()
 
     // Create and show GUI using a custom Display
     val display = Display()
@@ -83,7 +81,7 @@ private class Gui(display: Display) : CoroutineScope {
         }
     }
 
-    override val coroutineContext = Dispatchers.swt(shell.display) + SupervisorJob()
+    override val coroutineContext = Dispatchers.swt(display) + SupervisorJob()
 
     private val progressBar = ProgressBar(shell, SWT.SMOOTH).apply {
         minimum = 0
@@ -93,40 +91,21 @@ private class Gui(display: Display) : CoroutineScope {
     private val progressLabel = Label(shell, SWT.SINGLE or SWT.CENTER)
 
     /** Open GUI window.*/
-    fun open() = launchSWT {
-        shell.pack()
-        shell.open()
+    fun open() = launch(shell) {
+        shell.orNull()?.pack()
+        shell.orNull()?.open()
     }
 
     /** Close GUI window.*/
-    fun close() = launchSWT {
-        shell.close()
+    fun close() = launch(shell) {
+        shell.orNull()?.close()
     }
 
     /** Update progress information.*/
-    fun updateProgress(percent: Int) = launchSWT {
+    fun updateProgress(percent: Int) = launch(shell) {
         println("Updating progress: $percent")
-        progressLabel.text = "$percent %"
-        progressBar.selection = percent
-        shell.layout(true, true)
-    }
-
-    /**
-     * Dispatches given [block] to correct [SWT] thread.
-     *
-     * NOTE: The [block] may not get executed if the [shell] is already disposed.
-     */
-    private fun launchSWT(
-        context: CoroutineContext = EmptyCoroutineContext,
-        start: CoroutineStart = CoroutineStart.DEFAULT,
-        block: suspend CoroutineScope.() -> Unit
-    ) {
-        if (!shell.isDisposed) {
-            launch(context, start) {
-                if (!shell.isDisposed) {
-                    block()
-                }
-            }
-        }
+        progressLabel.orNull()?.text = "$percent %"
+        progressBar.orNull()?.selection = percent
+        shell.orNull()?.layout(true, true)
     }
 }

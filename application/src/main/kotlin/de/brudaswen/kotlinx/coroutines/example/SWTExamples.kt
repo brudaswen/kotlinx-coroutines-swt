@@ -4,6 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swt.SWT
+import kotlinx.coroutines.swt.launch
+import kotlinx.coroutines.swt.orNull
 import kotlinx.coroutines.swt.swt
 import org.eclipse.swt.SWT
 import org.eclipse.swt.graphics.Font
@@ -40,28 +42,42 @@ fun updateUiInNewThread(display: Display, label: Label) = thread {
     // Dispatch to default display (via [Dispatchers.Main])
     Thread.sleep(1000)
     GlobalScope.launch(Dispatchers.Main) {
-        label.text = "Main!"
+        label.text = "launch(Dispatchers.Main)"
         label.pack()
     }
 
     // Dispatch to default display (via [Dispatchers.SWT])
     Thread.sleep(1000)
     GlobalScope.launch(Dispatchers.SWT) {
-        label.text = "SWT!"
+        label.text = "launch(Dispatchers.SWT)"
         label.pack()
     }
 
     // Dispatch to given display
     Thread.sleep(1000)
     GlobalScope.launch(Dispatchers.swt(display)) {
-        label.text = "Display!"
+        label.text = "launch(Dispatchers.swt(display))"
         label.pack()
     }
 
     // Dispatch to display of widget
     Thread.sleep(1000)
     GlobalScope.launch(Dispatchers.swt(label)) {
-        label.text = "Widget!"
+        label.text = "launch(Dispatchers.swt(label))"
         label.pack()
+    }
+
+    // Dispatch via Display extension
+    Thread.sleep(1000)
+    GlobalScope.launch(display) {
+        label.orNull()?.text = "launch(display)"
+        label.orNull()?.pack()
+    }
+
+    // Dispatch via Widget extension
+    Thread.sleep(1000)
+    GlobalScope.launch(label) {
+        label.orNull()?.text = "launch(label)"
+        label.orNull()?.pack()
     }
 }

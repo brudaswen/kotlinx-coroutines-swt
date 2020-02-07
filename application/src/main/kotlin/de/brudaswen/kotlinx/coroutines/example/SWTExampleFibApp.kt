@@ -1,9 +1,7 @@
 package de.brudaswen.kotlinx.coroutines.example
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.swt.SWT
+import kotlinx.coroutines.swt.launch
 import org.eclipse.swt.SWT
 import org.eclipse.swt.layout.FillLayout
 import org.eclipse.swt.widgets.*
@@ -14,8 +12,6 @@ import kotlin.concurrent.thread
 
 /**
  * SWT example that starts a long running computation in a new thread.
- *
- * Dispatches UI updates via [Dispatchers.SWT] for the default Display.
  */
 fun main() {
     // Create and show GUI
@@ -61,7 +57,7 @@ fun main() {
                 }
 
                 // Add a new row to table
-                GlobalScope.launch(Dispatchers.SWT) {
+                GlobalScope.launch(table) {
                     if (!table.isDisposed) {
                         TableItem(table, SWT.NULL, 0).apply {
                             setText(0, n.toString())

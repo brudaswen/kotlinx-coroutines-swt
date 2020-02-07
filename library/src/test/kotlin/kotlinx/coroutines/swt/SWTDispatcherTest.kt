@@ -11,10 +11,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 @UseExperimental(ExperimentalCoroutinesApi::class)
 class SWTDispatcherTest : TestBase() {
@@ -310,7 +307,7 @@ class SWTDispatcherTest : TestBase() {
         @Test
         @DisplayName("Dispatchers.swt(Display) should be executed in correct Display thread")
         fun testLaunchInSecondaryDisplay() {
-            SWTDefaultDisplayDispatchThread().use { dispatcher ->
+            SWTDispatchThread().use { dispatcher ->
                 val display = dispatcher.display
                 runBlocking {
                     check(!display.isEventDispatchThread())
@@ -330,7 +327,7 @@ class SWTDispatcherTest : TestBase() {
         @Test
         @DisplayName("Dispatchers.swt(Widget) should be executed in correct Display thread")
         fun testLaunchInSecondaryDisplayWithWidget() {
-            SWTDefaultDisplayDispatchThread().use { dispatcher ->
+            SWTDispatchThread().use { dispatcher ->
                 val display = dispatcher.display
                 runBlocking {
                     check(!display.isEventDispatchThread())
@@ -350,29 +347,146 @@ class SWTDispatcherTest : TestBase() {
         @Test
         @DisplayName("Test that launch on closed Display fails")
         fun testLaunchOnClosedDisplay() = runTest(expected = { it is SWTException }) {
-            val dispatcher = SWTDefaultDisplayDispatchThread()
-            val display = dispatcher.display
+            SWTDispatchThread().use { dispatcher ->
+                val display = dispatcher.display
 
-            check(!display.isEventDispatchThread())
-            expect(1)
+                check(!display.isEventDispatchThread())
+                expect(1)
 
-            dispatcher.close()
-            val job = launch(Dispatchers.swt(display)) {
-                expectUnreached()
+                dispatcher.close()
+                val job = launch(Dispatchers.swt(display)) {
+                    expectUnreached()
+                }
+                finish(2)
+                job.join() // Should throw SWTException
             }
-            finish(2)
-            job.join() // Should throw SWTException
+        }
+    }
+
+    @Nested
+    @DisplayName("LaunchDisplayExtensions")
+    inner class LaunchDisplayExtensions {
+
+        @Test
+        @DisplayName("launch(Display) should execute in correct SWT thread")
+        fun testLaunchWithDisplay() {
+            SWTDispatchThread().use { dispatcher ->
+                val display = dispatcher.display
+                runBlocking {
+                    check(!display.isEventDispatchThread())
+
+                    expect(1)
+                    val job = launch(display) {
+                        check(display.isEventDispatchThread())
+                        expect(2)
+                    }
+                    assertNotNull(job)
+
+                    job.join()
+                    finish(3)
+                }
+            }
+        }
+
+        @Test
+        @DisplayName("launch(Display) on disposed display should not throw exception")
+        fun testLaunchWithDisposedDisplay() {
+            SWTDispatchThread().use { dispatcher ->
+                val display = dispatcher.display
+                runBlocking {
+                    check(!display.isEventDispatchThread())
+
+                    expect(1)
+                    dispatcher.close()
+                    val job = launch(display) {
+                        expectUnreached()
+                    }
+                    assertNull(job)
+
+                    finish(2)
+                }
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("LaunchWidgetExtensions")
+    inner class LaunchWidgetExtensions {
+
+        @Test
+        @DisplayName("launch(Widget) should execute in correct SWT thread")
+        fun testLaunchWithDisplay() {
+            SWTDispatchThread().use { dispatcher ->
+                val display = dispatcher.display
+                val widget = dispatcher.shell
+                runBlocking {
+                    check(!display.isEventDispatchThread())
+
+                    expect(1)
+                    val job = launch(widget) {
+                        check(display.isEventDispatchThread())
+                        expect(2)
+                    }
+                    assertNotNull(job)
+
+                    job.join()
+                    finish(3)
+                }
+            }
+        }
+
+        @Test
+        @DisplayName("launch(Widget) on disposed display should not throw exception")
+        fun testLaunchWithDisposedDisplay() {
+            SWTDispatchThread().use { dispatcher ->
+                val display = dispatcher.display
+                val widget = dispatcher.shell
+                runBlocking {
+                    check(!display.isEventDispatchThread())
+
+                    expect(1)
+                    dispatcher.close()
+                    val job = launch(widget) {
+                        expectUnreached()
+                    }
+                    assertNull(job)
+
+                    finish(2)
+                }
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("WidgetOrNullExtension")
+    inner class WidgetOrNullExtension {
+
+        @Test
+        @DisplayName("Widget.orNull() should return Widget if not disposed")
+        fun testWidgetNotDisposed() {
+            SWTDispatchThread().use { dispatcher ->
+                assertNotNull(dispatcher.shell.orNull())
+            }
+        }
+
+        @Test
+        @DisplayName("Widget.orNull() should return null if disposed")
+        fun testWidgetDisposed() {
+            SWTDispatchThread().use { dispatcher ->
+                dispatcher.close()
+                assertNull(dispatcher.shell.orNull())
+            }
         }
     }
 
     companion object {
 
-        private lateinit var DISPATCHER: SWTDefaultDisplayDispatchThread
+        private lateinit var DISPATCHER: SWTDispatchThread
 
         @BeforeAll
         @JvmStatic
         fun init() {
-            DISPATCHER = SWTDefaultDisplayDispatchThread()
+            DISPATCHER = SWTDispatchThread { Display.getDefault() }
         }
 
         @AfterAll

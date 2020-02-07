@@ -51,22 +51,32 @@ fun main() {
 fun updateUiInNewThread(display: Display, label: Label) = thread {
     // Dispatch to default display (via [Dispatchers.Main])
     GlobalScope.launch(Dispatchers.Main) {
-        label.text = "Main!"
+        label.text = "launch(Dispatchers.Main)"
     }
 
     // Dispatch to default display (via [Dispatchers.SWT])
     GlobalScope.launch(Dispatchers.SWT) {
-        label.text = "SWT!"
+        label.text = "launch(Dispatchers.SWT)"
     }
 
     // Dispatch to given display
     GlobalScope.launch(Dispatchers.swt(display)) {
-        label.text = "Display!"
+        label.text = "launch(Dispatchers.swt(display))"
     }
 
     // Dispatch to display of widget
     GlobalScope.launch(Dispatchers.swt(label)) {
-        label.text = "Widget!"
+        label.text = "launch(Dispatchers.swt(label))"
+    }
+
+    // Dispatch via Display extension
+    GlobalScope.launch(display) {
+        label.orNull()?.text = "launch(display)"
+    }
+
+    // Dispatch via Widget extension
+    GlobalScope.launch(label) {
+        label.orNull()?.text = "launch(label)"
     }
 }
 ```

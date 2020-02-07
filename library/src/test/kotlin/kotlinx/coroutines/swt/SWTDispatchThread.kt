@@ -9,10 +9,12 @@ import kotlin.concurrent.thread
 /**
  * Dispatcher thread for the SWT default [Display].
  *
- * Creates [Display.getDefault] in a new thread.
+ * Creates [Display] by executing [createDisplay] in a new thread.
  * The new thread handles all dispatched events for the default [Display].
+ *
+ * @param createDisplay The method to create a new [Display] (default: `Display()`).
  */
-internal class SWTDefaultDisplayDispatchThread : Closeable {
+internal class SWTDispatchThread(private val createDisplay: () -> Display = { Display() }) : Closeable {
 
     /** The name of the thread. */
     val name = "SWTDefaultDisplayDispatchThread"
@@ -30,7 +32,7 @@ internal class SWTDefaultDisplayDispatchThread : Closeable {
         val future = CompletableFuture<Shell>()
         thread = thread(name = name) {
             try {
-                val display = Display()
+                val display = createDisplay()
                 val shell = Shell(display)
                 future.complete(shell)
 
