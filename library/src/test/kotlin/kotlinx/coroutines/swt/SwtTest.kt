@@ -3,6 +3,7 @@ package kotlinx.coroutines.swt
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.selects.select
+import org.eclipse.swt.SWTException
 import org.eclipse.swt.widgets.Display
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -302,6 +303,68 @@ class SwtTest : TestBase() {
         }
     }
 
+    @Nested
+    @DisplayName("Secondary display")
+    inner class SecondaryDisplay {
+
+        @Test
+        @DisplayName("Dispatchers.swt(Display) should be executed in correct Display thread")
+        fun testLaunchInSecondaryDisplay() {
+            SWTDefaultDisplayDispatchThread().use { dispatcher ->
+                val display = dispatcher.display
+                runBlocking {
+                    check(!display.isEventDispatchThread())
+
+                    expect(1)
+                    val job = launch(Dispatchers.swt(display)) {
+                        check(display.isEventDispatchThread())
+                        expect(2)
+                    }
+
+                    job.join()
+                    finish(3)
+                }
+            }
+        }
+
+        @Test
+        @DisplayName("Dispatchers.swt(Widget) should be executed in correct Display thread")
+        fun testLaunchInSecondaryDisplayWithWidget() {
+            SWTDefaultDisplayDispatchThread().use { dispatcher ->
+                val display = dispatcher.display
+                runBlocking {
+                    check(!display.isEventDispatchThread())
+
+                    expect(1)
+                    val job = launch(Dispatchers.swt(dispatcher.shell)) {
+                        check(display.isEventDispatchThread())
+                        expect(2)
+                    }
+
+                    job.join()
+                    finish(3)
+                }
+            }
+        }
+
+        @Test
+        @DisplayName("Test that launch on closed Display fails")
+        fun testLaunchOnClosedDisplay() = runTest(expected = { it is SWTException }) {
+            val dispatcher = SWTDefaultDisplayDispatchThread()
+            val display = dispatcher.display
+
+            check(!display.isEventDispatchThread())
+            expect(1)
+
+            dispatcher.close()
+            val job = launch(Dispatchers.swt(display)) {
+                expectUnreached()
+            }
+            finish(2)
+            job.join() // Should throw SWTException
+        }
+    }
+
     companion object {
 
         private lateinit var DISPATCHER: SWTDefaultDisplayDispatchThread
@@ -315,7 +378,7 @@ class SwtTest : TestBase() {
         @AfterAll
         @JvmStatic
         fun cleanup() {
-            DISPATCHER.dispose()
+            DISPATCHER.close()
         }
     }
 }

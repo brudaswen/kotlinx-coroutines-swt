@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.*
 import java.math.BigInteger
 import java.text.NumberFormat
 import java.util.concurrent.CancellationException
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
 /**
@@ -30,6 +29,9 @@ fun main() {
             spacing = 5
             setMinimumSize(400, 300)
         }
+        addListener(SWT.Close) {
+            display.dispose()
+        }
     }
 
     val table = Table(shell, SWT.BORDER).apply {
@@ -46,20 +48,21 @@ fun main() {
     shell.open()
 
     // Start calculation in new thread and update UI using [Dispatchers.SWT].
-    val cancelled = AtomicBoolean(false)
     thread {
         try {
             var i = 0
-            while (!cancelled.get()) {
+            while (!table.isDisposed) {
                 val n = i++
 
                 // Calculate next Fibonacci number
                 println("Calculating fib($n)")
-                val result = fib(BigInteger.valueOf(n.toLong()), cancelled)
+                val result = fib(BigInteger.valueOf(n.toLong())) {
+                    table.isDisposed
+                }
 
                 // Add a new row to table
                 GlobalScope.launch(Dispatchers.SWT) {
-                    if (!shell.isDisposed) {
+                    if (!table.isDisposed) {
                         TableItem(table, SWT.NULL, 0).apply {
                             setText(0, n.toString())
                             setText(1, NumberFormat.getNumberInstance().format(result))
@@ -74,13 +77,8 @@ fun main() {
         }
     }
 
-    // Stop calculation when closing window
-    shell.addListener(SWT.Close) {
-        cancelled.set(true)
-    }
-
     // Dispatch events until SWT window is closed
-    while (!shell.isDisposed) {
+    while (!display.isDisposed) {
         if (!display.readAndDispatch()) {
             display.sleep()
         }
@@ -90,9 +88,9 @@ fun main() {
     println("Exiting...")
 }
 
-private fun fib(n: BigInteger, cancelled: AtomicBoolean): BigInteger =
+private fun fib(n: BigInteger, isCancelled: () -> Boolean): BigInteger =
     when {
-        cancelled.get() -> throw CancellationException()
+        isCancelled() -> throw CancellationException()
         n < BigInteger.TWO -> BigInteger.ONE
-        else -> fib(n - BigInteger.ONE, cancelled) + fib(n - BigInteger.TWO, cancelled)
+        else -> fib(n - BigInteger.ONE, isCancelled) + fib(n - BigInteger.TWO, isCancelled)
     }

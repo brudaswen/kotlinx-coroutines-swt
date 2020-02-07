@@ -2,6 +2,7 @@ package kotlinx.coroutines.swt
 
 import org.eclipse.swt.widgets.Display
 import org.eclipse.swt.widgets.Shell
+import java.io.Closeable
 import java.util.concurrent.CompletableFuture
 import kotlin.concurrent.thread
 
@@ -11,31 +12,30 @@ import kotlin.concurrent.thread
  * Creates [Display.getDefault] in a new thread.
  * The new thread handles all dispatched events for the default [Display].
  */
-internal class SWTDefaultDisplayDispatchThread {
+internal class SWTDefaultDisplayDispatchThread : Closeable {
 
     /** The name of the thread. */
     val name = "SWTDefaultDisplayDispatchThread"
 
     private var thread: Thread
 
-    /** Get [Shell] of this dispatcher thread */
-    val shell: Shell
-
     /** Get [Display] of this dispatcher thread */
     val display: Display
-        get() = shell.display
+
+    /** Get [Shell] of this dispatcher thread */
+    val shell: Shell
 
     init {
         // Start new thread and let it initialize Display and Shell
         val future = CompletableFuture<Shell>()
         thread = thread(name = name) {
             try {
-                val display = Display.getDefault()
+                val display = Display()
                 val shell = Shell(display)
                 future.complete(shell)
 
                 // Start dispatch loop
-                while (!shell.isDisposed) {
+                while (!display.isDisposed) {
                     if (!display.readAndDispatch()) {
                         display.sleep()
                     }
@@ -48,13 +48,14 @@ internal class SWTDefaultDisplayDispatchThread {
 
         // Wait until Shell is ready
         shell = future.get()
+        display = shell.display
     }
 
     /** Dispose the display and stop the event dispatcher thread. */
-    fun dispose() {
+    override fun close() {
         if (!display.isDisposed) {
             display.syncExec {
-                shell.close()
+                display.dispose()
             }
 
             thread.join()

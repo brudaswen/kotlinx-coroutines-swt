@@ -41,7 +41,7 @@ fun main() {
 
     updateUiInNewThread(display, label)
 
-    while (!shell.isDisposed) {
+    while (!display.isDisposed) {
         if (!display.readAndDispatch()) {
             display.sleep()
         }

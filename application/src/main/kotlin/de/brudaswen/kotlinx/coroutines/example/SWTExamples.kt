@@ -16,6 +16,9 @@ fun main() {
     // Create UI in some thread
     val display = Display.getDefault()
     val shell = Shell(display).apply {
+        addListener(SWT.Close) {
+            display.dispose()
+        }
         open()
     }
     val label = Label(shell, SWT.NULL).apply {
@@ -26,7 +29,7 @@ fun main() {
 
     updateUiInNewThread(display, label)
 
-    while (!shell.isDisposed) {
+    while (!display.isDisposed) {
         if (!display.readAndDispatch()) {
             display.sleep()
         }

@@ -42,9 +42,7 @@ internal abstract class SwtDispatcher(
 ) : MainCoroutineDispatcher(), Delay {
 
     override fun dispatch(context: CoroutineContext, block: Runnable) {
-        if (!display.isDisposed) {
-            display.asyncExec(block)
-        }
+        display.asyncExec(block)
     }
 
     override fun scheduleResumeAfterDelay(timeMillis: Long, continuation: CancellableContinuation<Unit>) {
@@ -59,11 +57,8 @@ internal abstract class SwtDispatcher(
         schedule(timeMillis, block)
 
     private fun schedule(timeMillis: Long, action: Runnable): DisposableHandle {
-        if (!display.isDisposed) {
-            display.timerExec(timeMillis.toInt(), action)
-            return DisposableHandle { display.timerExec(-1, action) }
-        }
-        return DisposableHandle { }
+        display.timerExec(timeMillis.toInt(), action)
+        return DisposableHandle { display.timerExec(-1, action) }
     }
 
     override fun toString() = "SWT-$name"

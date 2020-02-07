@@ -32,10 +32,12 @@ fun main() {
             spacing = 5
             setMinimumSize(400, 0)
         }
+        addListener(SWT.Close) {
+            display.dispose()
+        }
     }
 
     val label = Label(shell, SWT.SINGLE or SWT.CENTER)
-
     shell.pack()
     shell.open()
 
@@ -43,7 +45,7 @@ fun main() {
     // This works since timeText widget is part of the default display.
     GlobalScope.launch(Dispatchers.Main) {
         val dateFormat = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
-        while (!shell.isDisposed) {
+        while (!label.isDisposed) {
             println("Updating time")
             label.text = dateFormat.format(LocalTime.now())
             delay(TIME_UPDATE_DELAY)
@@ -51,7 +53,7 @@ fun main() {
     }
 
     // Dispatch events until SWT window is closed
-    while (!shell.isDisposed) {
+    while (!display.isDisposed) {
         if (!display.readAndDispatch()) {
             display.sleep()
         }

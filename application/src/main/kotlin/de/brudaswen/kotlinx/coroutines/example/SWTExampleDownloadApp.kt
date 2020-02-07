@@ -37,7 +37,7 @@ fun main() {
     }
 
     // Dispatch events until SWT window is closed
-    while (!gui.isDisposed) {
+    while (!display.isDisposed) {
         if (!display.readAndDispatch()) {
             display.sleep()
         }
@@ -78,12 +78,12 @@ private class Gui(display: Display) : CoroutineScope {
             spacing = 5
             setMinimumSize(400, 0)
         }
+        addListener(SWT.Close) {
+            display.dispose()
+        }
     }
 
     override val coroutineContext = Dispatchers.swt(shell.display) + SupervisorJob()
-
-    val isDisposed
-        get() = shell.isDisposed
 
     private val progressBar = ProgressBar(shell, SWT.SMOOTH).apply {
         minimum = 0
@@ -93,31 +93,40 @@ private class Gui(display: Display) : CoroutineScope {
     private val progressLabel = Label(shell, SWT.SINGLE or SWT.CENTER)
 
     /** Open GUI window.*/
-    fun open() = launchIfNotDisposed {
+    fun open() = launchSWT {
         shell.pack()
         shell.open()
     }
 
     /** Close GUI window.*/
-    fun close() = launchIfNotDisposed {
+    fun close() = launchSWT {
         shell.close()
     }
 
     /** Update progress information.*/
-    fun updateProgress(percent: Int) = launchIfNotDisposed {
+    fun updateProgress(percent: Int) = launchSWT {
         println("Updating progress: $percent")
         progressLabel.text = "$percent %"
         progressBar.selection = percent
         shell.layout(true, true)
     }
 
-    private fun launchIfNotDisposed(
+    /**
+     * Dispatches given [block] to correct [SWT] thread.
+     *
+     * NOTE: The [block] may not get executed if the [shell] is already disposed.
+     */
+    private fun launchSWT(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
         block: suspend CoroutineScope.() -> Unit
-    ) = launch(context, start) {
+    ) {
         if (!shell.isDisposed) {
-            block()
+            launch(context, start) {
+                if (!shell.isDisposed) {
+                    block()
+                }
+            }
         }
     }
 }
