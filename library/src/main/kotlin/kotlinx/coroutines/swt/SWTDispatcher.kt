@@ -51,18 +51,19 @@ internal abstract class SwtDispatcher(
         val action = Runnable {
             with(continuation) { resumeUndispatched(Unit) }
         }
-        schedule(timeMillis, action)
+        val handle = schedule(timeMillis, action)
+        continuation.disposeOnCancellation(handle)
     }
 
-    override fun invokeOnTimeout(timeMillis: Long, block: Runnable): DisposableHandle {
+    override fun invokeOnTimeout(timeMillis: Long, block: Runnable): DisposableHandle =
         schedule(timeMillis, block)
-        return DisposableHandle { }
-    }
 
-    private fun schedule(timeMillis: Long, action: Runnable) {
+    private fun schedule(timeMillis: Long, action: Runnable): DisposableHandle {
         if (!display.isDisposed) {
             display.timerExec(timeMillis.toInt(), action)
+            return DisposableHandle { display.timerExec(-1, action) }
         }
+        return DisposableHandle { }
     }
 
     override fun toString() = "SWT-$name"
