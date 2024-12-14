@@ -1,7 +1,7 @@
 # Kotlin Coroutines SWT
 
 [![Maven Central](https://img.shields.io/maven-central/v/de.brudaswen.kotlinx.coroutines/kotlinx-coroutines-swt?style=flat-square)](https://search.maven.org/artifact/de.brudaswen.kotlinx.coroutines/kotlinx-coroutines-swt)
-![Snapshot](https://img.shields.io/nexus/s/de.brudaswen.kotlinx.coroutines/kotlinx-coroutines-swt?label=snapshot&server=https%3A%2F%2Foss.sonatype.org&style=flat-square)
+[![Snapshot](https://img.shields.io/nexus/s/de.brudaswen.kotlinx.coroutines/kotlinx-coroutines-swt?label=snapshot&server=https%3A%2F%2Foss.sonatype.org&style=flat-square)](https://oss.sonatype.org/#nexus-search;gav~de.brudaswen.kotlinx.coroutines~kotlinx-coroutines-swt~~~)
 [![CI Status](https://img.shields.io/github/actions/workflow/status/brudaswen/kotlinx-coroutines-swt/ci-master.yml?style=flat-square)](https://github.com/brudaswen/kotlinx-coroutines-swt/actions/workflows/ci-master.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/brudaswen/kotlinx-coroutines-swt?style=flat-square)](https://codecov.io/gh/brudaswen/kotlinx-coroutines-swt)
 [![License](https://img.shields.io/github/license/brudaswen/kotlinx-coroutines-swt?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0)
